@@ -10,14 +10,26 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onCommand:domqs.find"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.helloWorld",
-				"title": "Hello World"
+				"command": "domqs.find",
+				"title": "DOMQS: Find by query selector."
+			}
+		],
+		"configuration":[
+			{
+				"title": "DOMQS Configurations",
+				"properties": {
+					"domqs.availableLanguages":{
+						"type":"array",
+						"default":["html","xml","javascriptreact"],
+						"description": "DOMQS is only available for these languages."
+					}
+				}
 			}
 		]
 	},
