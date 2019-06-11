@@ -1,3 +1,6 @@
+// Query selecting type definitions and interfaces
+
+// Attribute comparison types
 export const FIND_ATTR_VALUE_EQUAL = 'FIND_ATTR_VALUE_EQUAL';
 export const FIND_ATTR_VALUE_HAS = 'FIND_ATTR_VALUE_HAS';
 export const FIND_ATTR_VALUE_CONTAINS = 'FIND_ATTR_VALUE_CONTAINS';
@@ -20,6 +23,7 @@ export interface FindAttribute {
     comparison: FindComparison;
 }
 
+// Element next level types
 export const DOMQS_NEXT_LEVEL_CHILD = 'DOMQS_NEXT_LEVEL_CHILD';
 export const DOMQS_NEXT_LEVEL_ADJ_SIBLING = 'DOMQS_NEXT_LEVEL_ADJ_SIBLING';
 export const DOMQS_NEXT_LEVEL_GEN_SIBLING = 'DOMQS_NEXT_LEVEL_GEN_SIBLING';
@@ -32,7 +36,24 @@ export interface FindElement {
     attributes:FindAttribute[];
     // nth child index (first child = 0,...,last child = -1)
     childrenIndex?:number;
-    nextElement?:FindElement;
     nextElementLevel?: FindNextLevel;
-        
+    name?:string;
+}
+
+// DOM parser type defintions
+export interface Attribute {
+    name:string;
+    value?:string|boolean;
+    startingAt:number;
+    endingAt:number;
+}
+
+export interface Element {
+    name:string;
+    attributes:Attribute[];
+    startTagStartingAt:number;
+    startTagEndingAt:number;
+    endTagStartingAt:number;
+    endTagEndingAt:number;
+    childrens:Element[];
 }

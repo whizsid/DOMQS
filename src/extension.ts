@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import querySelectorParser from './querySelectorParser';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -35,12 +36,25 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		// Getting query selector from the user
-		let qs = vscode.window.showInputBox({
+		vscode.window.showInputBox({
 			placeHolder:"Enter the query selector",
 			ignoreFocusOut:true
+		}).then(value=>{
+			if(typeof value ==='undefined'){
+				return;
+			}
+			
+			let findingElements = querySelectorParser(value);
+
+			let document = activeTextEditor.document.getText();
+
+
+
+			
+	
 		});
 
-
+		
 
 	});
 

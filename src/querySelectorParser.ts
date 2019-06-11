@@ -1,4 +1,4 @@
-import { FindAttribute, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_LANG, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_HAS, FindComparison } from "./types";
+import { FindAttribute, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_LANG, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_HAS, FindComparison, FindNextLevel, DOMQS_NEXT_LEVEL_CHILD, DOMQS_NEXT_LEVEL_GEN_SIBLING, DOMQS_NEXT_LEVEL_ADJ_SIBLING, FindElement } from "./types";
 
 const resolveElementAttributes = (el:string):FindAttribute[]=>{
     let attributes:FindAttribute[] = [];
@@ -9,7 +9,7 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
         for (const attrClass of classes) {
             attributes.push({
                 name:"class",
-                value:attrClass,
+                value:attrClass.slice(1),
                 comparison:FIND_ATTR_VALUE_CONTAINS
             });
         }
@@ -74,7 +74,20 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
     return attributes;
 };
 
-export default(qs:string):void=>{
+const resolveElementName = (el:string):string|undefined=>{
+
+    const reg = /\b(\w+)(.*)/g;
+
+    const matched = reg.exec(el);
+
+    if(!matched){
+        return undefined;
+    }
+
+    return matched[1];
+};
+
+export default(qs:string):FindElement[]=>{
 
     // Removing unwanted spaces from query selector
     qs = qs.replace(/(\s+)/g," ").replace(/\s(\~|\+|\>)/g,"$1").replace(/(\~|\+|\>)\s/g,"$1");
@@ -82,14 +95,43 @@ export default(qs:string):void=>{
     // Spliting by combinators
     const splited = qs.split(/(\~|\+|\>|\s)/g);
 
+    let elements:FindElement[] = [];
+
     for (let index = 0; index < splited.length; index=index+2) {
         const attributesString = splited[index];
         const nextLevelString = splited[index+1];
+        let nextLevel:FindNextLevel;
 
         const attributes = resolveElementAttributes(attributesString);
-        
-        
+        const name = resolveElementName(attributesString);
+
+        switch (nextLevelString) {
+            case " ":
+                nextLevel = DOMQS_NEXT_LEVEL_CHILD;
+                break;
+            case ">":
+                nextLevel = DOMQS_NEXT_LEVEL_CHILD;
+                break;
+            case "~":
+                nextLevel = DOMQS_NEXT_LEVEL_GEN_SIBLING;
+                break;
+            case "+":
+                nextLevel = DOMQS_NEXT_LEVEL_ADJ_SIBLING;
+                break;
+            default:
+                nextLevel = DOMQS_NEXT_LEVEL_CHILD;
+                break;
+        }
+
+        const childElement = {
+            attributes,
+            nextElementLevel:nextLevel,
+            name
+        };
+
+        elements.push(childElement);
     }
 
+    return elements;
 
 };
