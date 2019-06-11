@@ -1,6 +1,9 @@
 import { Attribute, Element } from "./types";
 
 const domParser =  (txt:string,offset=0):Element[]=>{
+    // Removing line breaks
+    txt = txt.replace(/\r?\n|\r/g," ");
+
     const startTagRgxp = /\<(\w+)([^\>]+)(\>|\/\>)/g;
 
     let elements:Element[] = [];
@@ -14,6 +17,7 @@ const domParser =  (txt:string,offset=0):Element[]=>{
 
             const startTagStartingAt = offset + txt.search(tag);
             const startTagEndingAt = startTagStartingAt + tag.length;
+            
             let childrens:Element[] = [];
             let endTagStartingAt = startTagStartingAt;
             let endTagEndingAt = startTagEndingAt;
@@ -29,9 +33,9 @@ const domParser =  (txt:string,offset=0):Element[]=>{
 
                 let matchAttr:RegExpExecArray|null;
 
-                while((matchAttr = attrRegex.exec(txt))!== null){
+                while((matchAttr = attrRegex.exec(tag))!== null){
 
-                    const startingAt = txt.search(matchAttr[0]);
+                    const startingAt = startTagStartingAt+tag.search(matchAttr[0]);
 
                     attributes.push({
                         name:matchAttr[1],
@@ -42,7 +46,7 @@ const domParser =  (txt:string,offset=0):Element[]=>{
                 }
 
                 if(tag.trim().substr(-2)!=='/>'){
-                    const fullTagRegex = new RegExp("\<"+name+"([^\>]+)\>(.*?)\<\/"+name+"(\\s+|)\>","g");
+                    const fullTagRegex = new RegExp("\<"+name+"([^\>]+|)\>(.*?)\<\/"+name+"(\\s+|)\>","g");
 
                     const fullTagMatched = fullTagRegex.exec(txt);
 
@@ -53,8 +57,9 @@ const domParser =  (txt:string,offset=0):Element[]=>{
                         childrens = domParser(innerText,startTagEndingAt);
                     }
                 }
+                
 
-                txt = txt.slice(0,endTagEndingAt);
+                txt = txt.slice(0,startTagStartingAt-offset)+txt.slice(endTagEndingAt-offset);
 
             }
 
@@ -67,6 +72,8 @@ const domParser =  (txt:string,offset=0):Element[]=>{
                 endTagEndingAt,
                 childrens
             });
+
+            offset = endTagEndingAt;
         }
     }
 

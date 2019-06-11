@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import querySelectorParser from './querySelectorParser';
+import { Element } from './types';
+import domParser from './domParser';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -48,7 +50,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 			let document = activeTextEditor.document.getText();
 
+			const parsed:Element[] = domParser(document);
 
+			
 
 			
 	
