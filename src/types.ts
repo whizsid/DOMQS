@@ -30,7 +30,8 @@ export const DOMQS_NEXT_LEVEL_GEN_SIBLING = 'DOMQS_NEXT_LEVEL_GEN_SIBLING';
 
 export type FindNextLevel = typeof DOMQS_NEXT_LEVEL_ADJ_SIBLING |
     typeof DOMQS_NEXT_LEVEL_CHILD |
-    typeof DOMQS_NEXT_LEVEL_GEN_SIBLING;
+    typeof DOMQS_NEXT_LEVEL_GEN_SIBLING |
+    undefined;
 
 export interface FindElement {
     attributes:FindAttribute[];

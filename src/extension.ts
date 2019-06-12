@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import querySelectorParser from './querySelectorParser';
-import { Element } from './types';
+import { Element, FindElement } from './types';
 import domParser from './domParser';
 
 // this method is called when your extension is activated
@@ -23,6 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
+		// Getting language id and checking the weather language is supporting by DOMQS
 		const langId = activeTextEditor.document.languageId;
 
 		let availableLangs:string[]|undefined = vscode.workspace.getConfiguration("domqs").get("availableLanguages");
@@ -46,16 +47,25 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 			
-			let findingElements = querySelectorParser(value);
+			// Parsing query selector and document
+			const findingElements: FindElement[] = querySelectorParser(value);
 
-			let document = activeTextEditor.document.getText();
+			if(!findingElements.length){
+				vscode.window.showErrorMessage("Please enter a valid query selector to search.");
+				return;
+			}
+
+			const document = activeTextEditor.document.getText();
 
 			const parsed:Element[] = domParser(document);
 
-			
+			if(!parsed.length){
+				vscode.window.showErrorMessage("Can not find any DOM element in the opened text editor.");
+				return;
+			}
+
 
 			
-	
 		});
 
 		
