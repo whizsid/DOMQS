@@ -6,7 +6,7 @@ import { Attribute, Element } from "./types";
  * @param txt
  * @param offset 
  */
-const domParser =  (txt:string,offset=0):Element[]=>{
+const domParser =  (txt:string,offset=0,lang="en"):Element[]=>{
 
     // Removing line breaks
     txt = txt.replace(/\r?\n|\r/g," ");
@@ -16,6 +16,8 @@ const domParser =  (txt:string,offset=0):Element[]=>{
 
     // Childrens storing in this array
     let elements:Element[] = [];
+
+    let key=0;
 
     while(txt.match(startTagRgxp)){
 
@@ -103,13 +105,21 @@ const domParser =  (txt:string,offset=0):Element[]=>{
                 startTagEndingAt,
                 endTagStartingAt,
                 endTagEndingAt,
-                childrens
+                childrens,
+                key,
+                totalChildrens:0
             });
+            key++;
 
             // Adding length of the current tag to the starting offset
             offset = endTagEndingAt;
         }
     }
+
+    elements = elements.map(element=>{
+        element.totalChildrens = key;
+        return element;
+    });
 
     return elements;
 };

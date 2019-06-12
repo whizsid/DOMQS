@@ -1,4 +1,4 @@
-import { FindAttribute, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_LANG, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_HAS, FindComparison, FindNextLevel, DOMQS_NEXT_LEVEL_CHILD, DOMQS_NEXT_LEVEL_GEN_SIBLING, DOMQS_NEXT_LEVEL_ADJ_SIBLING, FindElement } from "./types";
+import { FindAttribute, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_HAS, FindComparison, FindNextLevel, DOMQS_NEXT_LEVEL_CHILD, DOMQS_NEXT_LEVEL_GEN_SIBLING, DOMQS_NEXT_LEVEL_ADJ_SIBLING, FindElement } from "./types";
 
 /**
  * Resolve attributes in the HTML tag
@@ -58,7 +58,7 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
                         comparison = FIND_ATTR_VALUE_CONTAINS;
                         break;
                     case "|=":
-                        comparison = FIND_ATTR_VALUE_LANG;
+                        comparison = FIND_ATTR_VALUE_BEGIN;
                         break;
                     case "^=":
                         comparison = FIND_ATTR_VALUE_BEGIN;

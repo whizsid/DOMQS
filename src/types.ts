@@ -4,7 +4,6 @@
 export const FIND_ATTR_VALUE_EQUAL = 'FIND_ATTR_VALUE_EQUAL';
 export const FIND_ATTR_VALUE_HAS = 'FIND_ATTR_VALUE_HAS';
 export const FIND_ATTR_VALUE_CONTAINS = 'FIND_ATTR_VALUE_CONTAINS';
-export const FIND_ATTR_VALUE_LANG = 'FIND_ATTR_VALUE_LANG';
 export const FIND_ATTR_VALUE_BEGIN = 'FIND_ATTR_VALUE_BEGIN';
 export const FIND_ATTR_VALUE_END = 'FIND_ATTR_VALUE_END';
 export const FIND_ATTR_VALUE_CONTAIN = 'FIND_ATTR_VALUE_CONTAIN';
@@ -12,7 +11,6 @@ export const FIND_ATTR_VALUE_CONTAIN = 'FIND_ATTR_VALUE_CONTAIN';
 export type FindComparison = typeof FIND_ATTR_VALUE_EQUAL |
     typeof FIND_ATTR_VALUE_HAS |
     typeof FIND_ATTR_VALUE_CONTAINS |
-    typeof FIND_ATTR_VALUE_LANG |
     typeof FIND_ATTR_VALUE_BEGIN |
     typeof FIND_ATTR_VALUE_END |
     typeof FIND_ATTR_VALUE_CONTAIN;
@@ -57,4 +55,18 @@ export interface Element {
     endTagStartingAt:number;
     endTagEndingAt:number;
     childrens:Element[];
+    key:number;
+    totalChildrens:number;
+}
+
+// Finder types
+export const FOUND_SELECTION_ATTR = 'FOUND_SELECTION_ATTR';
+export const FOUND_SELECTION_TAG = 'FOUND_SELECTION_TAG';
+
+export type FoundSelectionType = typeof FOUND_SELECTION_ATTR | typeof FOUND_SELECTION_TAG;
+
+export interface FoundSelection {
+    startingAt:number;
+    endingAt:number;
+    type:FoundSelectionType;
 }
