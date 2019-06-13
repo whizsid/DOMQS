@@ -1,9 +1,16 @@
 import * as vscode from 'vscode';
 import querySelectorParser from './querySelectorParser';
-import { Element, FindElement } from './types';
+import { Element, FindElement, FoundSelection, FOUND_SELECTION_TAG } from './types';
 import domParser from './domParser';
+import finder from './finder';
+
+let selections:FoundSelection[] = [];
+let statusBarItem: vscode.StatusBarItem;
 
 export function activate(context: vscode.ExtensionContext) {
+
+	statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	context.subscriptions.push(statusBarItem);
 
 	let disposable = vscode.commands.registerCommand('domqs.find', () => {
 
@@ -56,7 +63,15 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-						
+			const found = finder(parsed,findingElements);
+
+			if(found){
+				selections = found.filter(el=>el.type===FOUND_SELECTION_TAG);
+			}
+
+			// Updating status bar with number of elements
+			updateStatusBarItem(selections.length);
+
 		});
 
 		
@@ -64,6 +79,24 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+}
+
+function updateStatusBarItem(foundCount:number): void {
+
+	if (foundCount > 0) {
+		statusBarItem.text = `$(megaphone) ${foundCount} element(s) found`;
+		
+		statusBarItem.show();
+	} else {
+		statusBarItem.hide();
+	}
+}
+
+function makeRange(document:string,selection:FoundSelection){
+	const beginPart = document.slice(0,selection.startingAt);
+	let startLine = beginPart.split("\n").length;
+
+	
 }
 
 // this method is called when your extension is deactivated

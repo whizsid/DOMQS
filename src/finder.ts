@@ -1,11 +1,17 @@
-import { Element, FindElement, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_HAS, FoundSelection } from "./types";
+import { Element, FindElement, FIND_ATTR_VALUE_BEGIN, FIND_ATTR_VALUE_CONTAIN, FIND_ATTR_VALUE_END, FIND_ATTR_VALUE_EQUAL, FIND_ATTR_VALUE_CONTAINS, FIND_ATTR_VALUE_HAS, FoundSelection, DOMQS_NEXT_LEVEL_GEN_SIBLING, FOUND_SELECTION_TAG, FOUND_SELECTION_ATTR, DOMQS_NEXT_LEVEL_ADJ_SIBLING, DOMQS_NEXT_LEVEL_CHILD } from "./types";
 
-const match = (element:Element,findElement:FindElement)=>{
+const match = (element:Element,findElement:FindElement):FoundSelection[]|null=>{
     let matched = true;
+    let selections:FoundSelection[] = [];
 
     // Matching name if supplied
     if(typeof findElement.name!=='undefined'){
         matched = findElement.name === element.name;
+        selections.push({
+            type:FOUND_SELECTION_ATTR,
+            startingAt:element.startTagStartingAt+1,
+            endingAt:element.startTagStartingAt +1 + element.name.length
+        });
     }
 
     // Matching children index if supplied
@@ -47,32 +53,76 @@ const match = (element:Element,findElement:FindElement)=>{
                 } else if(findAttr.comparison!==FIND_ATTR_VALUE_HAS){
                     matched=false;
                 }
+
+                if(matched){
+                    selections.push({
+                        type:FOUND_SELECTION_ATTR,
+                        startingAt:attr.startingAt,
+                        endingAt:attr.endingAt
+                    });
+                }
             }
         }
     }
 
-    return matched;
+    return matched?selections:null;
 
 };
 
-const finder = (document:Element[],term:FindElement[],currentLevel:number=0):FoundSelection[]=>{
+const finder = (document:Element[],term:FindElement[],currentLevel:number=0,childCheck=false):FoundSelection[]|null=>{
 
     const currentFindElement = term[currentLevel];
-    const selections:FoundSelection[] = [];
+    let selections:FoundSelection[] = [];
+    let matched:FoundSelection[]|null = [];
 
-    for(const element of document){
-        const matched = match(element,currentFindElement);
+    let nextLevel:string|undefined = currentFindElement.nextElementLevel;
+
+    for (let index = 0; index < document.length; index++) {
+        const element = document[index];
+
+        matched = match(element,currentFindElement);
 
         if(matched){
-            
+            let found:FoundSelection[]|null; 
+            switch (nextLevel) {
+                case DOMQS_NEXT_LEVEL_GEN_SIBLING:
+                        found = finder(document.slice(index+1),term,currentLevel+1);
+                    break;
+                case DOMQS_NEXT_LEVEL_ADJ_SIBLING:
+                        found = finder([document[index+1]],term,currentLevel+1);
+                    break;   
+                case DOMQS_NEXT_LEVEL_CHILD:
+                        found = finder(element.childrens,term,currentLevel+1,true);
+                    break;
+                default:
+                        found = [{
+                            type:FOUND_SELECTION_TAG,
+                            startingAt:element.startTagStartingAt,
+                            endingAt:element.endTagEndingAt
+                        }];
+                    break;
+            }
+
+            if(found){
+                matched = matched.concat(found);
+            }
+
+        } else if(typeof nextLevel ==='undefined'){
+            matched = null;
+        } else{
+            if(match(element,term[0])){
+                childCheck = false;
+            }
+            matched = finder(element.childrens,term,childCheck?currentLevel:0);
+        } 
+
+        if(matched){
+            selections = selections.concat(matched);
         }
     }
 
-    if(typeof term[currentLevel].nextElementLevel!=='undefined'){
-        
-    }
-
-
-    return selections;
+    return selections.length?selections:null;
 
 };
+
+export default finder;
