@@ -18,6 +18,10 @@
 			{
 				"command": "domqs.find",
 				"title": "DOMQS: Find by query selector."
+			},
+			{
+				"command": "domqs.selectAll",
+				"title": "DOMQS: Select all occurrences of find match."
 			}
 		],
 		"configuration":[

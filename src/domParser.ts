@@ -77,8 +77,10 @@ const domParser =  (txt:string,offset=0,lang="en"):Element[]=>{
 
                     if(fullTagMatched){
 
+                        tag = fullTagMatched[0];
+
                         // fullTagMatched[0] is the full string of the tag
-                        endTagEndingAt = startTagStartingAt + fullTagMatched[0].length;
+                        endTagEndingAt = startTagStartingAt + tag.length;
 
                         // 3 is the reserved length for the tag characters (for </ and >)
                         // fullTagMatched[3] is the space after name in closing tag
@@ -112,7 +114,7 @@ const domParser =  (txt:string,offset=0,lang="en"):Element[]=>{
             key++;
 
             // Adding length of the current tag to the starting offset
-            offset = endTagEndingAt;
+            offset += tag.length;
         }
     }
 
