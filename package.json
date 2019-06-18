@@ -22,6 +22,14 @@
 			{
 				"command": "domqs.selectAll",
 				"title": "DOMQS: Select all occurrences of find match."
+			},
+			{
+				"command": "domqs.nextSelection",
+				"title": "DOMQS: Go to the next selection."
+			},
+			{
+				"command": "domqs.previousSelection",
+				"title": "DOMQS: Go to the previous selection."
 			}
 		],
 		"configuration":[

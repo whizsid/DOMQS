@@ -70,3 +70,7 @@ export interface FoundSelection {
     endingAt:number;
     type:FoundSelectionType;
 }
+
+export interface CommandCollection {
+    [key:string]:()=>void;
+}

@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import querySelectorParser from './querySelectorParser';
-import { Element, FindElement, FoundSelection, FOUND_SELECTION_TAG } from './types';
+import { Element, FindElement, FoundSelection, FOUND_SELECTION_TAG, CommandCollection } from './types';
 import domParser from './domParser';
 import finder from './finder';
 
@@ -75,35 +75,68 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(findCommand);
 
-	let selectAllCommand = vscode.commands.registerCommand('domqs.selectAll',()=>{
-		const activeTextEditor = vscode.window.activeTextEditor;
+	let selectionCommands:CommandCollection = {
+		selectAll:()=>{
+			let i = 0;
 
-		const validated = validateDocument(activeTextEditor);
+			currentSelections = [];
 
-		if(!validated||!activeTextEditor){
-			return;
+			for(const selection in selections){
+				currentSelections.push(i);
+				i++;
+			}
+		},
+		nextSelection:()=>{
+			let selectionsLength = selections.length;
+			let lastSelection = currentSelections.pop();
+
+			if(typeof lastSelection!=='undefined'){
+				currentSelections = [lastSelection>=selectionsLength?0:lastSelection+1];
+			}
+		},
+		previousSelection:()=>{
+			let selectionsLength = selections.length;
+			let firstSelection = currentSelections.shift();
+
+			if(typeof firstSelection!=='undefined'){
+				currentSelections = [firstSelection===0?selectionsLength-1:firstSelection-1];
+			}
 		}
+	};
 
-		if(!foundSelections){
-			vscode.window.showErrorMessage("You haven't found for any element. You can not run next selection/ previous selection or select all commands before finding elements.");
-			return;
-		}
+	for (const commandName of Object.keys(selectionCommands)){
+		const command = vscode.commands.registerCommand('domqs.'+commandName,()=>{
+			const activeTextEditor = vscode.window.activeTextEditor;
 
-		let i = 0;
+			const validated = validateDocument(activeTextEditor);
 
-		for(const selection in selections){
-			currentSelections.push(i);
-		}
+			if(!validated||!activeTextEditor){
+				return;
+			}
 
-		decorateSelections(activeTextEditor);
-	});
-	context.subscriptions.push(selectAllCommand);
+			if(!foundSelections){
+				vscode.window.showErrorMessage("You haven't found for any element. You can not run next selection/ previous selection or select all commands before finding elements.");
+				return;
+			}
 
-	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(hideSelections));
+			selectionCommands[commandName]();
+
+			decorateSelections(activeTextEditor);
+		});
+
+		context.subscriptions.push(command);
+
+	}
+
+	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(changeTextEditor));
 	context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection(hideSelections));
 
 }
-
+/**
+ * Validating the document in the current open editor and return the status
+ * 
+ * @param activeTextEditor 
+ */
 function validateDocument(activeTextEditor:vscode.TextEditor|undefined):boolean{
 	// If file is not opened
 	if(typeof activeTextEditor ==='undefined'){
@@ -128,7 +161,11 @@ function validateDocument(activeTextEditor:vscode.TextEditor|undefined):boolean{
 
 	return true;
 }
-
+/**
+ * Decorating the other selections and current selections
+ * 
+ * @param activeTextEditor 
+ */
 function decorateSelections(activeTextEditor:vscode.TextEditor){
 	let decorations:vscode.DecorationOptions[] = [];
 	let selectedTags:vscode.Selection[] = [];
@@ -145,13 +182,15 @@ function decorateSelections(activeTextEditor:vscode.TextEditor){
 		i++;
 	}
 
+	activeTextEditor.selections = selectedTags;
+
+	activeTextEditor.setDecorations(selectionDecoration,decorations);
 	foundSelections = true;
 
-	activeTextEditor.selections = selectedTags;
-	activeTextEditor.setDecorations(selectionDecoration,decorations);
-
 }
-
+/**
+ * Setting up the decorations after destroyed by the dispose method and on initial
+ */
 function setDecorations(){
 
 	selectionDecoration = vscode.window.createTextEditorDecorationType({
@@ -161,9 +200,33 @@ function setDecorations(){
 	currentSelectionDecoration = vscode.window.createTextEditorDecorationType({
 		backgroundColor: new vscode.ThemeColor('editor.selectionHighlightBackground')
 	});
-}
 
-function hideSelections():void{
+}
+/**
+ * Alias to the hideSelections method.
+ */
+function changeTextEditor(){
+	hideSelections();
+}
+/**
+ * Hiding the all selections and highlighted texts
+ * 
+ * @param e
+ */
+function hideSelections(e:vscode.TextEditorSelectionChangeEvent|undefined=undefined):void{
+
+	if(typeof e !== 'undefined'){
+		if(typeof e.kind!=='undefined'){
+			if(e.kind===3){
+				return;
+			}
+		} else {
+			return;
+		}
+	} else {
+		return;
+	}
+
 	updateStatusBarItem(0);
 
 	selectionDecoration.dispose();
@@ -175,7 +238,11 @@ function hideSelections():void{
 
 	setDecorations();
 }
-
+/**
+ * Updating the status bar to dispalying the count of matching elements
+ * 
+ * @param foundCount
+ */
 function updateStatusBarItem(foundCount:number): void {
 
 	if (foundCount > 0) {
@@ -186,7 +253,12 @@ function updateStatusBarItem(foundCount:number): void {
 		statusBarItem.hide();
 	}
 }
-
+/**
+ * Making a VSCode position
+ * 
+ * @param document document text as tring
+ * @param position text offset from the begining
+ */
 function makePosition(document:string,position:number):vscode.Position{
 	const lines = document.slice(0,position).split(/\r?\n|\r/g);
 	const lineIndex = lines.length-1;
@@ -195,7 +267,12 @@ function makePosition(document:string,position:number):vscode.Position{
 
 	return new vscode.Position(lineIndex,cursor);
 }
-
+/**
+ * Making a VSCode range
+ * 
+ * @param document 
+ * @param selection 
+ */
 function makeRange(document:string,selection:FoundSelection):vscode.Range{
 
 	return new vscode.Range(makePosition(document,selection.startingAt),makePosition(document,selection.endingAt));
