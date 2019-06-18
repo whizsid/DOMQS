@@ -43,6 +43,32 @@
 					}
 				}
 			}
+		],
+		"keybindings":[
+			{
+				"command": "domqs.find",
+				"key": "ctrl+alt+f",
+				"mac": "cmd+alt+f",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "domqs.selectAll",
+				"key": "ctrl+alt+a",
+				"mac": "cmd+alt+a",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "domqs.nextSelection",
+				"key": "ctrl+alt+m",
+				"mac": "cmd+alt+m",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "domqs.previousSelection",
+				"key": "ctrl+alt+p",
+				"mac": "cmd+alt+p",
+				"when": "editorTextFocus"
+			}
 		]
 	},
 	"scripts": {
