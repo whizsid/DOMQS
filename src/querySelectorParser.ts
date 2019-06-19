@@ -91,7 +91,7 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
  */
 const resolveElementName = (el:string):string|undefined=>{
     // Regex for search the tag name
-    const reg = /\b(\w+)(.*)/g;
+    const reg = /\<(\w+)(.*)/g;
 
     const matched = reg.exec(el);
 

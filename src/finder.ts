@@ -31,6 +31,7 @@ const match = (element:Element,findElement:FindElement):FoundSelection[]|null=>{
             if(attr.name===findAttr.name && matched){
                 // When both attributes has an value
                 if(typeof attr.value !=='undefined'&&typeof findAttr.value!=='undefined'){
+
                     switch (findAttr.comparison) {
                         case FIND_ATTR_VALUE_BEGIN:
                                 matched = attr.value.toString().search(findAttr.value)===0;
@@ -39,7 +40,7 @@ const match = (element:Element,findElement:FindElement):FoundSelection[]|null=>{
                                 matched = attr.value.toString().search(findAttr.value)>=0;
                             break;
                         case FIND_ATTR_VALUE_CONTAINS:
-                                matched = attr.value.toString().search(new RegExp("\\b"+findAttr.value+"\\b","g"))>=0;
+                                matched = attr.value.toString().search(new RegExp("(^|\\s)"+findAttr.value+"(\\s|$)","g"))>=0;
                             break;
                         case FIND_ATTR_VALUE_END:
                                 matched = attr.value.toString().search(findAttr.value)+findAttr.value.length===attr.value.toString().length;
@@ -50,6 +51,7 @@ const match = (element:Element,findElement:FindElement):FoundSelection[]|null=>{
                         default:
                             break;
                     }
+
                 } else if(findAttr.comparison!==FIND_ATTR_VALUE_HAS){
                     matched=false;
                 }
