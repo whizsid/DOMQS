@@ -59,16 +59,14 @@ export interface Element {
     totalChildrens:number;
 }
 
-// Finder types
-export const FOUND_SELECTION_ATTR = 'FOUND_SELECTION_ATTR';
-export const FOUND_SELECTION_TAG = 'FOUND_SELECTION_TAG';
-
-export type FoundSelectionType = typeof FOUND_SELECTION_ATTR | typeof FOUND_SELECTION_TAG;
 
 export interface FoundSelection {
-    startingAt:number;
-    endingAt:number;
-    type:FoundSelectionType;
+    /* Parent element that matched previously */
+    parent?:FoundSelection;
+    /* Matched element */
+    element:Element;
+    /* Matched attributes. This array will empty if only name is matched. */
+    attributes:Attribute[];
 }
 
 export interface CommandCollection {

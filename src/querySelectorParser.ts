@@ -42,43 +42,42 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
     // Getting matched attributes
     const attrs = el.match(attrRegex);
 
-    if(attrs){
-        for (const attr of attrs){
-            const matched = attrRegex.exec(attr);
+    let matched:RegExpExecArray|null;
 
-            if(matched){
+    while((matched = attrRegex.exec(el))!== null){
 
-                let comparison:FindComparison;
-                // Resolving the comparison type
-                switch (matched[2]) {
-                    case "=":
-                        comparison = FIND_ATTR_VALUE_EQUAL;
-                        break;
-                    case "=~":
-                        comparison = FIND_ATTR_VALUE_CONTAINS;
-                        break;
-                    case "|=":
-                        comparison = FIND_ATTR_VALUE_BEGIN;
-                        break;
-                    case "^=":
-                        comparison = FIND_ATTR_VALUE_BEGIN;
-                        break;
-                    case "$=":
-                        comparison = FIND_ATTR_VALUE_END;
-                        break;
-                    case "*=":
-                        comparison = FIND_ATTR_VALUE_CONTAIN;
-                        break;
-                    default:
-                        comparison = FIND_ATTR_VALUE_HAS;
-                }
+        if(matched){
 
-                attributes.push({
-                    name:matched[1],
-                    comparison,
-                    value:matched[3]
-                });
+            let comparison:FindComparison;
+            // Resolving the comparison type
+            switch (matched[2]) {
+                case "=":
+                    comparison = FIND_ATTR_VALUE_EQUAL;
+                    break;
+                case "=~":
+                    comparison = FIND_ATTR_VALUE_CONTAINS;
+                    break;
+                case "|=":
+                    comparison = FIND_ATTR_VALUE_BEGIN;
+                    break;
+                case "^=":
+                    comparison = FIND_ATTR_VALUE_BEGIN;
+                    break;
+                case "$=":
+                    comparison = FIND_ATTR_VALUE_END;
+                    break;
+                case "*=":
+                    comparison = FIND_ATTR_VALUE_CONTAIN;
+                    break;
+                default:
+                    comparison = FIND_ATTR_VALUE_HAS;
             }
+
+            attributes.push({
+                name:matched[1],
+                comparison,
+                value:matched[3]
+            });
         }
     }
 
@@ -91,7 +90,7 @@ const resolveElementAttributes = (el:string):FindAttribute[]=>{
  */
 const resolveElementName = (el:string):string|undefined=>{
     // Regex for search the tag name
-    const reg = /\<(\w+)(.*)/g;
+    const reg = /^(\w+)(.*)/g;
 
     const matched = reg.exec(el);
 

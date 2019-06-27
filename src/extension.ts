@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import querySelectorParser from './querySelectorParser';
-import { Element, FindElement, FoundSelection, FOUND_SELECTION_TAG, CommandCollection } from './types';
+import { Element, FindElement, FoundSelection, CommandCollection } from './types';
 import domParser from './domParser';
 import finder from './finder';
 
@@ -61,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			if(found){
 
-				selections = found.filter(el=>el.type===FOUND_SELECTION_TAG);
+				selections = found;
 				currentSelections = [0];
 
 				decorateSelections(activeTextEditor);
@@ -275,7 +275,7 @@ function makePosition(document:string,position:number):vscode.Position{
  */
 function makeRange(document:string,selection:FoundSelection):vscode.Range{
 
-	return new vscode.Range(makePosition(document,selection.startingAt),makePosition(document,selection.endingAt));
+	return new vscode.Range(makePosition(document,selection.element.startTagStartingAt),makePosition(document,selection.element.endTagEndingAt));
 }
 
 // this method is called when your extension is deactivated
