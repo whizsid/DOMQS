@@ -9,7 +9,7 @@
 
 DOMQS is a VS Code extension enable users to search by DOM query selectors in their HTML/XML documents.
 
-![DOMQS on VSCode](https://i.imgur.com/SjjHSj6.gif)
+![DOMQS on VSCode](https://i.imgur.com/2pZw63l.gif)
 
 ## Installation
 
@@ -27,7 +27,7 @@ Currently DOMQS is supporting only for `html` and `xml` file types. You can add 
 
 ## TODO
 
-Currently VS Code is not supporting to adding custom find terms. I have send them a [issue](microsoft/vscode#75152) to implement this feature. I can bind this library with new features after implemented.
+Currently VS Code is not supporting to adding custom find terms. I have send them a [issue](https://github.com/microsoft/vscode/issues/75152) to implement this feature. I can bind this library with new features after implemented.
 
 ## Contributions
 
