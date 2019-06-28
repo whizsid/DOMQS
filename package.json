@@ -1,10 +1,15 @@
 {
 	"name": "domqs",
 	"displayName": "DOMQS",
-	"description": "Searching DOM elements in your HTML/XML files by a query selector.",
+	"description": "Search facility by DOM query selectors in your HTML/XML files.",
+	"icon": "resources/logo-vscode.png",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.35.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/whizsid/DOMQS.git"
 	},
 	"categories": [
 		"Other"
@@ -32,19 +37,22 @@
 				"title": "DOMQS: Go to the previous selection."
 			}
 		],
-		"configuration":[
+		"configuration": [
 			{
 				"title": "DOMQS Configurations",
 				"properties": {
-					"domqs.availableLanguages":{
-						"type":"array",
-						"default":["html","xml","javascriptreact"],
+					"domqs.availableLanguages": {
+						"type": "array",
+						"default": [
+							"html",
+							"xml"
+						],
 						"description": "DOMQS is only available for these languages."
 					}
 				}
 			}
 		],
-		"keybindings":[
+		"keybindings": [
 			{
 				"command": "domqs.find",
 				"key": "ctrl+alt+f",
@@ -79,10 +87,14 @@
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"tslint": "^5.12.1",
+		"@types/cheerio": "^0.22.11",
+		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
-		"@types/mocha": "^2.2.42"
+		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28"
+	},
+	"dependencies": {
+		"cheerio": "^1.0.0-rc.3"
 	}
 }

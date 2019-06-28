@@ -1,8 +1,5 @@
 import * as vscode from 'vscode';
-import querySelectorParser from './querySelectorParser';
-import { Element, FindElement, FoundSelection, CommandCollection } from './types';
-import domParser from './domParser';
-import finder from './finder';
+import { FoundSelection, CommandCollection, ModCheerio, ModCheerioElement } from './types';
 
 let selections:FoundSelection[] = [];
 let currentSelections =[0];
@@ -13,6 +10,8 @@ let statusBarItem: vscode.StatusBarItem;
 let selectionDecoration:vscode.TextEditorDecorationType;
 let currentSelectionDecoration:vscode.TextEditorDecorationType;
 setDecorations();
+
+const cheerio = require('cheerio');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -37,31 +36,34 @@ export function activate(context: vscode.ExtensionContext) {
 			if(typeof value ==='undefined'){
 				return;
 			}
-			
-			// Parsing query selector and document
-			const findingElements: FindElement[] = querySelectorParser(value);
 
-			if(!findingElements.length){
+			if(!value.length){
 				vscode.window.showErrorMessage("Please enter a valid query selector to search.");
 				return;
 			}
 
 			const document = activeTextEditor.document.getText();
 
-			const parsed:Element[] = domParser(document);
-
-			if(!parsed.length){
-				vscode.window.showErrorMessage("Can not find any DOM element in the opened text editor.");
-				return;
-			}
-
-			const found = finder(parsed,findingElements);
+			const $ = cheerio.load(document,{ withStartIndices: true, xmlMode:true });
 
 			selections = [];
 
-			if(found){
+			let matched:ModCheerio = $(value);
 
-				selections = found;
+			matched.each(function(this: ModCheerio ,i,elem){
+
+				const $this:ModCheerio = $(this);
+				const tag:string =   $.html($this);
+				  
+				selections.push({
+					start:elem.startIndex,
+					end:elem.startIndex+tag.length
+				});
+				
+			});
+
+			if(selections.length){
+
 				currentSelections = [0];
 
 				decorateSelections(activeTextEditor);
@@ -77,13 +79,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let selectionCommands:CommandCollection = {
 		selectAll:()=>{
-			let i = 0;
 
 			currentSelections = [];
 
-			for(const selection in selections){
+			for(let i=0;i<selections.length;i++){
 				currentSelections.push(i);
-				i++;
 			}
 		},
 		nextSelection:()=>{
@@ -91,7 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 			let lastSelection = currentSelections.pop();
 
 			if(typeof lastSelection!=='undefined'){
-				currentSelections = [lastSelection>=selectionsLength?0:lastSelection+1];
+				currentSelections = [lastSelection+1>=selectionsLength?0:lastSelection+1];
 			}
 		},
 		previousSelection:()=>{
@@ -194,11 +194,11 @@ function decorateSelections(activeTextEditor:vscode.TextEditor){
 function setDecorations(){
 
 	selectionDecoration = vscode.window.createTextEditorDecorationType({
-		backgroundColor: new vscode.ThemeColor('editor.selectionBackground')
+		backgroundColor: new vscode.ThemeColor('editor.findRangeHighlightBackground')
 	});
 	
 	currentSelectionDecoration = vscode.window.createTextEditorDecorationType({
-		backgroundColor: new vscode.ThemeColor('editor.selectionHighlightBackground')
+		backgroundColor: new vscode.ThemeColor('editor.findMatchBackground')
 	});
 
 }
@@ -275,7 +275,7 @@ function makePosition(document:string,position:number):vscode.Position{
  */
 function makeRange(document:string,selection:FoundSelection):vscode.Range{
 
-	return new vscode.Range(makePosition(document,selection.element.startTagStartingAt),makePosition(document,selection.element.endTagEndingAt));
+	return new vscode.Range(makePosition(document,selection.start),makePosition(document,selection.end));
 }
 
 // this method is called when your extension is deactivated
