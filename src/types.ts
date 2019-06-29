@@ -7,6 +7,9 @@ export interface CommandCollection {
     [key:string]:()=>void;
 }
 
+/* I have modified cheerio type definitions. Because
+   cheerio is not supporting domhandler types currently.
+*/
 export interface ModCheerioElement extends CheerioElement {
     startIndex:number;
     endIndex:number;

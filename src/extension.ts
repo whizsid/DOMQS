@@ -1,17 +1,18 @@
 import * as vscode from 'vscode';
 import { FoundSelection, CommandCollection, ModCheerio, ModCheerioElement } from './types';
+const cheerio = require('cheerio');
 
+// Selection states
 let selections:FoundSelection[] = [];
 let currentSelections =[0];
 let foundSelections = false;
 
 let statusBarItem: vscode.StatusBarItem;
 
+// All selection decorations
 let selectionDecoration:vscode.TextEditorDecorationType;
 let currentSelectionDecoration:vscode.TextEditorDecorationType;
 setDecorations();
-
-const cheerio = require('cheerio');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -21,9 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
 	let findCommand = vscode.commands.registerCommand('domqs.find', () => {
 
 		const activeTextEditor = vscode.window.activeTextEditor;
-
+		// Validating the document 
 		const validated = validateDocument(activeTextEditor);
-
+		// If validation fails or can not found an active editor
 		if(!validated||!activeTextEditor){
 			return;
 		}
@@ -36,23 +37,32 @@ export function activate(context: vscode.ExtensionContext) {
 			if(typeof value ==='undefined'){
 				return;
 			}
-
-			if(!value.length){
+			// If value is empty string with white spaces
+			if(!value.trim().length){
 				vscode.window.showErrorMessage("Please enter a valid query selector to search.");
 				return;
 			}
-
+			// Getting all text in current active text document
 			const document = activeTextEditor.document.getText();
-
+			/* Loading our docuement with cheerio. We are using withStartIndices
+			   and withEndIndices options. Official cheerio documentation is not
+			   mention about them anywhere. Because these options is for domhandler.
+			   They are using domhandler for parsing our document to objects. See
+			   https://github.com/fb55/DomHandler#option-withstartindices This is the
+			   official documentation of withStartIndices and withEndIndices properties.
+			*/
 			const $ = cheerio.load(document,{ withStartIndices: true,withEndIndices: true, xmlMode:true });
-
+			// Setting all selections to an empty array
 			selections = [];
 
 			try {
-				
+				/* Passing our query selector and retrieving matching DOM objects. Cheerio
+				   is throwing an error when user passed an invalid query selector. this
+				   is why we are wrap this block with a try catch
+				*/
 				let matched:ModCheerio = $(value);
 
-
+				// Adding all matched objects to selections
 				matched.each(function(this: ModCheerio ,i,elem){
 					selections.push({
 						start:elem.startIndex,
@@ -61,9 +71,9 @@ export function activate(context: vscode.ExtensionContext) {
 				});
 	
 				if(selections.length){
-	
+					// Setting current selected object to first object that we found
 					currentSelections = [0];
-	
+					// Decorating our selections
 					decorateSelections(activeTextEditor);
 				}
 	
@@ -80,6 +90,9 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(findCommand);
 
+	/* We are storing all commands in an object. Because we don't need to
+	   repeat over and over our codes.
+	*/
 	let selectionCommands:CommandCollection = {
 		selectAll:()=>{
 
@@ -262,7 +275,7 @@ function updateStatusBarItem(foundCount:number): void {
  * @param document document text as tring
  * @param position text offset from the begining
  */
-function makePosition(document:string,position:number):vscode.Position{
+export function makePosition(document:string,position:number):vscode.Position{
 	const lines = document.slice(0,position).split(/\r?\n|\r/g);
 	const lineIndex = lines.length-1;
 	const line = lines.pop();
@@ -276,7 +289,7 @@ function makePosition(document:string,position:number):vscode.Position{
  * @param document 
  * @param selection 
  */
-function makeRange(document:string,selection:FoundSelection):vscode.Range{
+export function makeRange(document:string,selection:FoundSelection):vscode.Range{
 
 	return new vscode.Range(makePosition(document,selection.start),makePosition(document,selection.end));
 }
