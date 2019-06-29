@@ -4,7 +4,7 @@
 	"description": "Search facility by DOM query selectors in your HTML/XML files.",
 	"icon": "resources/logo-vscode.png",
 	"publisher": "whizsid",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"keywords": [
 		"query",
 		"selector",
