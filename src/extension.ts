@@ -44,33 +44,36 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const document = activeTextEditor.document.getText();
 
-			const $ = cheerio.load(document,{ withStartIndices: true, xmlMode:true });
+			const $ = cheerio.load(document,{ withStartIndices: true,withEndIndices: true, xmlMode:true });
 
 			selections = [];
 
-			let matched:ModCheerio = $(value);
-
-			matched.each(function(this: ModCheerio ,i,elem){
-
-				const $this:ModCheerio = $(this);
-				const tag:string =   $.html($this);
-				  
-				selections.push({
-					start:elem.startIndex,
-					end:elem.startIndex+tag.length
-				});
+			try {
 				
-			});
+				let matched:ModCheerio = $(value);
 
-			if(selections.length){
 
-				currentSelections = [0];
+				matched.each(function(this: ModCheerio ,i,elem){
+					selections.push({
+						start:elem.startIndex,
+						end:elem.endIndex+1
+					});
+				});
+	
+				if(selections.length){
+	
+					currentSelections = [0];
+	
+					decorateSelections(activeTextEditor);
+				}
+	
+				// Updating status bar with number of elements
+				updateStatusBarItem(selections.length);
 
-				decorateSelections(activeTextEditor);
+			} catch (error) {
+				vscode.window.showErrorMessage("Please enter a valid query selector to search.");
+				return;
 			}
-
-			// Updating status bar with number of elements
-			updateStatusBarItem(selections.length);
 
 		});
 
