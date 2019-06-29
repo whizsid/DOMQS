@@ -7,3 +7,8 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## 0.0.1
 
 - Initial release
+
+## 0.0.2
+
+- Added SEO Keywords
+- Added number of installes to markdown
