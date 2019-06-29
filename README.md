@@ -22,9 +22,12 @@ Currently DOMQS is supporting only for `html` and `xml` file types. You can add 
 
 ## Available Commands
 
+Press `Ctrl+Shift+P` and type 'DOMQS' to get a list of all commands.
+
 - Find by a query selector (Ctrl+Alt+F)
 - Go to the next selection (Ctrl+Alt+M)
 - Go to the previous selection (Ctrl+Alt+P)
+- Select All occurances
 
 ## TODO
 
