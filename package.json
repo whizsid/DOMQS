@@ -4,10 +4,42 @@
 	"description": "Search facility by DOM query selectors in your HTML/XML files.",
 	"icon": "resources/logo-vscode.png",
 	"publisher": "whizsid",
-	"version": "0.0.1",
+	"version": "0.0.2",
+	"keywords": [
+		"query",
+		"selector",
+		"html",
+		"css",
+		"search",
+		"tag",
+		"dom",
+		"xml",
+		"html5",
+		"find",
+		"id",
+		"class"
+	],
+	"preview": true,
 	"engines": {
 		"vscode": "^1.35.0"
 	},
+	"badges": [
+		{
+			"url": "https://img.shields.io/badge/License-MIT-brightgreen.svg",
+			"href": "https://opensource.org/licenses/MIT",
+			"description": "License: MIT"
+		},
+		{
+			"url": "https://dev.azure.com/whizsid/DOMQS/_apis/build/status/whizsid.DOMQS?branchName=master",
+			"href": "https://dev.azure.com/whizsid/DOMQS/_build/latest?definitionId=1&branchName=master",
+			"description": "Azure DevOps Build: Passing"
+		},
+		{
+			"url": "https://img.shields.io/visual-studio-marketplace/i/whizsid.domqs.svg?style=flat",
+			"href": "https://marketplace.visualstudio.com/items?itemName=whizsid.domqs",
+			"description": "VS Code: Installs"
+		}
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/whizsid/DOMQS.git"
